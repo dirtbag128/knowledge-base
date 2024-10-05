@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+    #quiz-container, #quiz-options {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .option {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .option:hover {
+        background-color: #f0f0f0;
+    }
+    .element {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border: 1px solid #333;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 4px;
+        background-color: #4CAF50;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="paper-texture" >Study Quiz</h1>
+<div id="quiz-options">
+    <h2>Select Topic</h2>
+    <form id="quiz-form">
+        <div>
+            <label for="directory">Select Quiz Category:</label>
+            <select id="directory" name="directory">
+                <option value="">All Categories</option>
+                {% for quiz_file in quiz_files %}
+                <option value="{{ quiz_file.split('/')[-1].split('.')[0] }}">{{ quiz_file.split('/')[-1].split('.')[0].replace('_', ' ').title() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="num-questions">Number of questions:</label>
+            <input type="number" id="num-questions" name="num_questions" value="10" min="1" max="50">
+        </div>
+        <button type="submit">Start Quiz</button>
+    </form>
+</div>
+<div id="quiz-container" style="display: none;">
+    <div id="question-container"></div>
+    <div style="margin-top: 20px;">
+        <button id="submit-quiz" style="display: none;">Submit Quiz</button>
+    </div>
+    <div id="results-container" style="display: none;"></div>
+</div>
+
+<script>
+let quiz = [];
+let currentQuestion = 0;
+let userAnswers = [];
+
+document.getElementById('quiz-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const directory = formData.get('directory');
+    const numQuestions = formData.get('num_questions');
+    
+    fetch(`/api/quiz?directory=${encodeURIComponent(directory)}&num_questions=${numQuestions}`)
+        .then(response => response.json())
+        .then(data => {
+            quiz = data;
+            currentQuestion = 0;
+            userAnswers = new Array(quiz.length).fill(null);
+            document.getElementById('quiz-options').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('submit-quiz').style.display = 'block';
+            showQuestion();
+        });
+});
+
+function showQuestion() {
+    if (currentQuestion >= quiz.length) {
+        document.getElementById('submit-quiz').style.display = 'block';
+        return;
+    }
+
+    const question = quiz[currentQuestion];
+    let html = `<h2>Question ${currentQuestion + 1}</h2>
+                <p>${question.question}</p>
+                <div class="options">`;
+    
+    question.options.forEach((option, index) => {
+        html += `<label class="option">
+                    <input type="radio" id="option${index}" name="answer" value="${option}" ${userAnswers[currentQuestion] === option ? 'checked' : ''}>
+                    <span>${formatOption(option)}</span>
+                 </label>`;
+    });
+    
+    html += `</div>
+             <div class="button-container" style="display: flex; justify-content: space-between; margin-top: 20px;">
+                 <button onclick="previousQuestion()">Previous</button>
+                 <button onclick="nextQuestion()">Next</button>
+             </div>`;
+    document.getElementById('question-container').innerHTML = html;
+    MathJax.typeset();
+}
+
+function formatOption(option) {
+    // Check if the option is a single element symbol
+    if (/^[A-Z][a-z]?$/.test(option)) {
+        return `<span class="element">${option}</span>`;
+    }
+    return option;
+}
+
+function previousQuestion() {
+    if (currentQuestion > 0) {
+        currentQuestion--;
+        showQuestion();
+    }
+}
+
+function nextQuestion() {
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    if (selectedOption) {
+        userAnswers[currentQuestion] = selectedOption.value;
+    }
+    currentQuestion++;
+    showQuestion();
+}
+
+document.getElementById('submit-quiz').addEventListener('click', function() {
+    let score = 0;
+    let resultsHtml = '<h2>Quiz Results</h2>';
+
+    quiz.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const isCorrect = userAnswer === question.correct_answer;
+        if (isCorrect) score++;
+
+        resultsHtml += `
+            <div>
+                <p><strong>Question ${index + 1}:</strong> ${question.question}</p>
+                <p>Your answer: ${formatOption(userAnswer) || 'Not answered'}</p>
+                <p>Correct answer: ${formatOption(question.correct_answer)}</p>
+                <p style="color: ${isCorrect ? 'green' : 'red'}">${isCorrect ? 'Correct' : 'Incorrect'}</p>
+            </div>
+            <hr>
+        `;
+    });
+
+    resultsHtml += `<h3>Your score: ${score} out of ${quiz.length}</h3>`;
+
+    document.getElementById('results-container').innerHTML = resultsHtml;
+    document.getElementById('results-container').style.display = 'block';
+    document.getElementById('question-container').style.display = 'none';
+    document.getElementById('submit-quiz').style.display = 'none';
+    MathJax.typeset();
+});
+</script>
+{% endblock %}

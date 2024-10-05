@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="paper-texture" >Topics</h1>
+<div class="directory-list">
+    {% for directory, notes in notes_by_dir.items() %}
+    <div class="directory-group">
+        <h2>{{ directory if directory else 'Root' }}</h2>
+        <ul class="note-list">
+            {% for note in notes %}
+            <li class="note-card">
+                <a href="{{ url_for('main.note', note_id=note.id) }}">{{ note.title }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+// ... (keep existing JavaScript)
+</script>
+{% endblock %}

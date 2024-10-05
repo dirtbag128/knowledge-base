@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}⛁SatviksKnowledgeBase⛁{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mhchem@3"></script>
+</head>
+<body>
+    <div class="parallax">
+        <div class="parallax__layer parallax__layer--back"></div>
+        <div class="parallax__layer parallax__layer--base">
+            <div class="container">
+                <header>
+                    <h1 class="paper-texture" class="retro-title">Knowledge-Base</h1>
+                    <nav>
+                        <!-- ... other navigation items ... -->
+                        <form action="{{ url_for('main.search') }}" method="get">
+                            <input type="text" name="q" placeholder="Search notes...">
+                            <button type="submit">Search</button>
+                        </form>
+                    </nav>
+                    <nav>
+                        <a href="{{ url_for('main.index') }}">Home</a>
+                        <a href="{{ url_for('main.quiz_page') }}">Quiz</a>
+                    </nav>
+                </header>
+                <main>
+                    {% block content %}{% endblock %}
+                </main>
+                <footer>
+                    <p>&copy; 2024 s64</p>
+                </footer>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

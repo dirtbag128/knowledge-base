@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ note.title }}</h1>
+<div id="note-content">{{ note.content|safe }}</div>
+<p><a href="{{ url_for('main.index') }}">Back to notes</a></p>
+
+<script>
+    MathJax = {
+        tex: {
+            inlineMath: [['\\(', '\\)']],
+            displayMath: [['\\[', '\\]']],
+            packages: ['base', 'ams', 'noerrors', 'noundefined', 'mhchem']
+        },
+        startup: {
+            pageReady: () => {
+                return MathJax.startup.defaultPageReady().then(() => {
+                    document.getElementById('note-content').style.visibility = 'visible';
+                });
+            }
+        }
+    };
+</script>
+{% endblock %}

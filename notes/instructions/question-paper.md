@@ -1,0 +1,85 @@
+Here's the YAML version of the quiz questions:
+
+```yaml:study_notes_app/quizzes/atomic_structure.yaml
+- question: "What is the wavelength of light emitted when the electron in a hydrogen atom drops from n = 4 to n = 2 level? (Given Rydberg constant R = 1.097 × 10⁷ m⁻¹)"
+  options:
+    - "486 nm"
+    - "656 nm"
+    - "410 nm"
+    - "364 nm"
+  correct_answer: "410 nm"
+
+- question: "Which of the following correctly describes the Heisenberg Uncertainty Principle?"
+  options:
+    - "It is impossible to simultaneously measure the exact momentum and position of an electron."
+    - "Electrons can only exist at quantized energy levels."
+    - "The uncertainty principle applies only to the hydrogen atom."
+    - "Electrons always move in circular orbits around the nucleus."
+  correct_answer: "It is impossible to simultaneously measure the exact momentum and position of an electron."
+
+# ... (continue for all 50 questions)
+```
+
+Rules for creating more YAML quiz files:
+
+1. File Format:
+   - Use `.yaml` or `.yml` file extension.
+   - Place the files in the `quizzes` directory.
+
+2. Structure:
+   - Each question is an item in a list, starting with a dash (`-`).
+   - Each question has three main keys: `question`, `options`, and `correct_answer`.
+
+3. Question Format:
+   - The `question` key contains the full text of the question.
+   - Use double quotes (`"`) to enclose the question text, especially if it contains special characters.
+
+4. Options:
+   - The `options` key contains a list of possible answers.
+   - Each option starts with a dash (`-`) and is enclosed in double quotes.
+   - Provide at least two options, typically four.
+
+5. Correct Answer:
+   - The `correct_answer` key contains the correct option.
+   - It must match exactly one of the options provided.
+
+6. Formatting:
+   - Use proper YAML indentation (typically 2 spaces).
+   - For multiline text, use the `>` symbol and indent the following lines.
+
+7. Special Characters:
+   - If using special characters or symbols, enclose the text in double quotes.
+   - For very complex formatting, you can use the `|` symbol for literal block scalar.
+
+8. Grouping:
+   - You can group related questions in the same file.
+   - Use descriptive file names for different topics or difficulty levels.
+
+9. Metadata (optional):
+   - You can add metadata at the top of the file, such as:
+     ```yaml
+     ---
+     topic: Atomic Structure
+     difficulty: Intermediate
+     total_questions: 50
+     ---
+     ```
+
+10. Consistency:
+    - Maintain a consistent style and format throughout the file and across different quiz files.
+
+Example of a complex question:
+
+```yaml
+- question: >
+    "Calculate the de Broglie wavelength of an electron moving at 5.97 × 10⁶ m/s:
+    (Given: h = 6.626 × 10⁻³⁴ J·s, mₑ = 9.109 × 10⁻³¹ kg)"
+  options:
+    - "1.22 × 10⁻¹⁰ m"
+    - "2.44 × 10⁻¹⁰ m"
+    - "4.88 × 10⁻¹⁰ m"
+    - "9.76 × 10⁻¹⁰ m"
+  correct_answer: "1.22 × 10⁻¹⁰ m"
+```
+
+By following these rules, you can create consistent and easily parseable quiz files in YAML format.
